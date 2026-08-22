@@ -52,7 +52,7 @@ services:
 
       # Mail Configuration
       MAIL_USERNAME: ${MAIL_USERNAME:-53cpravas@gmail.com}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-xbavaqowampttvbl}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-addYours}
 
       # Base URL & CORS
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5173}
