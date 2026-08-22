@@ -1,4 +1,4 @@
-# Odoo x NMIT Hackathon
+# Odoo x NMIT Hackathon 2026
 ---
 
 # Team Name: Tech Titans
