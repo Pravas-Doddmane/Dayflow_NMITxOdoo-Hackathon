@@ -1,0 +1,701 @@
+{
+  "info": {
+    "_postman_id": "dayflow-hrms-api-collection",
+    "name": "DayFlow HRMS API",
+    "description": "Comprehensive Postman API collection for DayFlow Human Resource Management System backend. Includes Company Sign Up, Email Verification, Multi-tenant Login, and auto-saving Bearer token scripts.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "company_name",
+      "value": "TechTitans",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employee_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_employee_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication & Company Onboarding",
+      "item": [
+        {
+          "name": "1.1 Admin Sign Up (Register Company & Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"TechTitans\",\n  \"email\": \"founder@techtitans.com\",\n  \"password\": \"FounderPass@2026\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Rivera\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register-admin",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register-admin"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Verify Email (Admin / Employee)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-email?token=<PASTE_VERIFICATION_TOKEN_FROM_EMAIL_OR_LOGS>",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-email"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "<PASTE_VERIFICATION_TOKEN_FROM_EMAIL_OR_LOGS>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 Admin Login (with Company Name)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"admin_token\", jsonData.token);",
+                  "    console.log(\"Saved admin_token successfully\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"TechTitans\",\n  \"email\": \"admin@dayflow.local\",\n  \"password\": \"AdminPass@2024\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Employee Login (with Company Name)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"employee_token\", jsonData.token);",
+                  "    console.log(\"Saved employee_token successfully\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"TechTitans\",\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"SecurePass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.5 Setup Password (From Employee Invitation Email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<PASTE_TOKEN_FROM_EMAIL_OR_LOGS>\",\n  \"newPassword\": \"SecurePass@123\",\n  \"confirmPassword\": \"SecurePass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/setup-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "setup-password"]
+            }
+          }
+        },
+        {
+          "name": "1.6 Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@company.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "1.7 Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<PASTE_RESET_TOKEN>\",\n  \"newPassword\": \"NewSecurePass@123\",\n  \"confirmPassword\": \"NewSecurePass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Admin - Employee Management",
+      "item": [
+        {
+          "name": "Create Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"created_employee_id\", jsonData.id);",
+                  "    console.log(\"Saved created_employee_id: \" + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP001\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@company.com\",\n  \"designation\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"joiningDate\": \"2026-08-22\",\n  \"phone\": \"+1234567890\",\n  \"gender\": \"MALE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/employees",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "employees"]
+            }
+          }
+        },
+        {
+          "name": "List Employees (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/employees?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "employees"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Employee by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/employees/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "employees", "{{created_employee_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+1987654321\",\n  \"address\": \"456 Tech Boulevard\",\n  \"designation\": \"Senior Software Engineer\",\n  \"department\": \"Engineering\",\n  \"employmentStatus\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/employees/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "employees", "{{created_employee_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Account Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/employees/{{created_employee_id}}/status?status=ACTIVE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "employees", "{{created_employee_id}}", "status"],
+              "query": [
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Employee Profile",
+      "item": [
+        {
+          "name": "Get Own Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/employees/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Own Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+1122334455\",\n  \"address\": \"789 Skyline Drive, Apt 4B\",\n  \"profilePictureUrl\": \"https://example.com/avatar.png\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Attendance Management",
+      "item": [
+        {
+          "name": "Check In (Employee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/attendance/check-in",
+              "host": ["{{base_url}}"],
+              "path": ["api", "attendance", "check-in"]
+            }
+          }
+        },
+        {
+          "name": "Check Out (Employee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/attendance/check-out",
+              "host": ["{{base_url}}"],
+              "path": ["api", "attendance", "check-out"]
+            }
+          }
+        },
+        {
+          "name": "Get Own Attendance (Employee)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/attendance/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "attendance", "me"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get All Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/attendance?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "attendance"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get Employee Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/attendance/employee/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "attendance", "employee", "{{created_employee_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Leave Management",
+      "item": [
+        {
+          "name": "Apply Leave (Employee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leaveType\": \"PAID\",\n  \"startDate\": \"2026-09-01\",\n  \"endDate\": \"2026-09-03\",\n  \"remarks\": \"Family trip\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/leaves",
+              "host": ["{{base_url}}"],
+              "path": ["api", "leaves"]
+            }
+          }
+        },
+        {
+          "name": "Get Own Leaves (Employee)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/leaves/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "leaves", "me"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get All Leaves",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/leaves",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "leaves"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Approve Leave",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Approved by manager\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/leaves/1/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "leaves", "1", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Reject Leave",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Critical sprint week\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/leaves/1/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "leaves", "1", "reject"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Salary Management",
+      "item": [
+        {
+          "name": "Admin - Create Salary Structure",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"basicSalary\": 50000.00,\n  \"hra\": 20000.00,\n  \"allowances\": 10000.00,\n  \"deductions\": 5000.00,\n  \"effectiveFrom\": \"2026-08-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/salary/employee/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "salary", "employee", "{{created_employee_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get Employee Salary History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/salary/employee/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "salary", "employee", "{{created_employee_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Employee - Get Own Salary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/salary/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "salary", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Document Management",
+      "item": [
+        {
+          "name": "Employee - View My Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employee_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/documents/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "me"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get Employee Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/documents/employee/{{created_employee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "documents", "employee", "{{created_employee_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
