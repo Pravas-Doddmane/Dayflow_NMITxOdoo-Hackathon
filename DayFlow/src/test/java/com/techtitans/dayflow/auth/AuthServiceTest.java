@@ -99,7 +99,7 @@ class AuthServiceTest {
             when(tokenService.createToken(any(), eq(TokenType.EMAIL_VERIFICATION))).thenReturn("verify-token");
             when(emailTemplateService.buildAdminRegistrationVerificationEmail(anyString(), any(), anyString())).thenReturn("<html/>");
 
-            authService.registerAdmin(new AdminRegisterRequest("Acme Corp", "admin@acme.com", "AdminPass@123", "Alice", "Smith"));
+            authService.registerAdmin(new AdminRegisterRequest("Acme Corp", "admin@acme.com", "AdminPass@123", "Alice", "Smith", null, null));
 
             verify(userRepository).save(any(User.class));
             verify(emailService).sendHtmlEmail(eq("admin@acme.com"), anyString(), anyString());
@@ -108,11 +108,10 @@ class AuthServiceTest {
         @Test
         @DisplayName("Duplicate company name throws DuplicateResourceException")
         void registerAdmin_duplicateCompany() {
-            when(userRepository.existsByEmail("admin@acme.com")).thenReturn(false);
             when(companyRepository.existsByNameIgnoreCase("Acme Corp")).thenReturn(true);
 
             assertThatThrownBy(() -> authService.registerAdmin(
-                    new AdminRegisterRequest("Acme Corp", "admin@acme.com", "AdminPass@123", "Alice", "Smith")))
+                    new AdminRegisterRequest("Acme Corp", "admin@acme.com", "AdminPass@123", "Alice", "Smith", null, null)))
                     .isInstanceOf(com.techtitans.dayflow.common.exception.DuplicateResourceException.class)
                     .hasMessageContaining("already registered");
         }

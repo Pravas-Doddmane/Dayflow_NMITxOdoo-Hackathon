@@ -40,8 +40,9 @@ public class AdminEmployeeController {
     @GetMapping
     @Operation(summary = "Get all employees (paginated)")
     public ResponseEntity<Page<EmployeeResponse>> getAllEmployees(
+            org.springframework.security.core.Authentication authentication,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
+        return ResponseEntity.ok(employeeService.getAllEmployees(authentication, pageable));
     }
 
     @GetMapping("/{id}")

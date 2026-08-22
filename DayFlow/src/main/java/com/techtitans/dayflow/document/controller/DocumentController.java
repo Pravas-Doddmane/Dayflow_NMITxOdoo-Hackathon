@@ -33,6 +33,31 @@ public class DocumentController {
         return ResponseEntity.ok(documentService.getMyDocuments(authentication));
     }
 
+    @GetMapping("/api/documents/{documentId}/download")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @Operation(summary = "Download a document by ID")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadDocument(
+            @PathVariable Long documentId,
+            Authentication authentication) {
+        com.techtitans.dayflow.document.entity.Document document = documentService.getDocumentOrThrow(documentId);
+        org.springframework.core.io.Resource fileResource = documentService.loadDocumentFile(documentId, authentication);
+
+        String filename = document.getFileName() != null ? document.getFileName() : "document.pdf";
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (filename.toLowerCase().endsWith(".pdf")) {
+            mediaType = MediaType.APPLICATION_PDF;
+        } else if (filename.toLowerCase().endsWith(".png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
+            mediaType = MediaType.IMAGE_JPEG;
+        }
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(fileResource);
+    }
+
     // ==========================================
     // Admin endpoints
     // ==========================================

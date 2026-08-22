@@ -123,7 +123,40 @@ public class AttendanceService {
 
     @Transactional(readOnly = true)
     public Page<AttendanceResponse> getAllAttendance(Long employeeId, LocalDate from, LocalDate to, Pageable pageable) {
-        return attendanceRepository.findAllByFilters(employeeId, from, to, pageable)
+        return getAllAttendance(null, employeeId, from, to, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AttendanceResponse> getAllAttendance(Authentication authentication, Long employeeId, LocalDate from, LocalDate to, Pageable pageable) {
+        Long companyId = null;
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            if (securityUser.getUser().getCompany() != null) {
+                companyId = securityUser.getUser().getCompany().getId();
+            }
+        }
+
+        final Long finalCompanyId = companyId;
+        org.springframework.data.jpa.domain.Specification<Attendance> spec = (root, query, cb) -> {
+            if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
+                root.fetch("employee", jakarta.persistence.criteria.JoinType.INNER);
+            }
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            if (finalCompanyId != null) {
+                predicates.add(cb.equal(root.get("employee").get("company").get("id"), finalCompanyId));
+            }
+            if (employeeId != null) {
+                predicates.add(cb.equal(root.get("employee").get("id"), employeeId));
+            }
+            if (from != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("attendanceDate"), from));
+            }
+            if (to != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("attendanceDate"), to));
+            }
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        return attendanceRepository.findAll(spec, pageable)
                 .map(AttendanceResponse::from);
     }
 

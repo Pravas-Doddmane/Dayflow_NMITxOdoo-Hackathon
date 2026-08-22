@@ -60,11 +60,12 @@ public class AttendanceController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all attendance records (paginated, filterable)")
     public ResponseEntity<Page<AttendanceResponse>> getAllAttendance(
+            Authentication authentication,
             @RequestParam(required = false) Long employeeId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(attendanceService.getAllAttendance(employeeId, from, to, pageable));
+        return ResponseEntity.ok(attendanceService.getAllAttendance(authentication, employeeId, from, to, pageable));
     }
 
     @GetMapping("/api/admin/attendance/employee/{employeeId}")

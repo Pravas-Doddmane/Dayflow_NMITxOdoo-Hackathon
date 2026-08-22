@@ -52,22 +52,31 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse createEmployee(Authentication authentication, CreateEmployeeRequest request) {
-        // Validate duplicates
-        if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateResourceException("An account with email '" + request.email() + "' already exists");
+        com.techtitans.dayflow.company.entity.Company company = null;
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            company = securityUser.getUser().getCompany();
         }
-        if (employeeRepository.existsByEmployeeCode(request.employeeCode())) {
-            throw new DuplicateResourceException("Employee code '" + request.employeeCode() + "' is already in use");
+
+        // Validate duplicates per company
+        if (company != null) {
+            if (userRepository.existsByEmailAndCompanyId(request.email().trim().toLowerCase(), company.getId())) {
+                throw new DuplicateResourceException("An account with email '" + request.email() + "' already exists in this company");
+            }
+            if (employeeRepository.existsByEmployeeCodeAndCompanyId(request.employeeCode(), company.getId())) {
+                throw new DuplicateResourceException("Employee code '" + request.employeeCode() + "' is already in use in this company");
+            }
+        } else {
+            if (userRepository.existsByEmail(request.email().trim().toLowerCase())) {
+                throw new DuplicateResourceException("An account with email '" + request.email() + "' already exists");
+            }
+            if (employeeRepository.existsByEmployeeCode(request.employeeCode())) {
+                throw new DuplicateResourceException("Employee code '" + request.employeeCode() + "' is already in use");
+            }
         }
 
         // Load EMPLOYEE role
         Role employeeRole = roleRepository.findByName(RoleName.EMPLOYEE)
                 .orElseThrow(() -> new ResourceNotFoundException("EMPLOYEE role not found. Ensure database is seeded."));
-
-        com.techtitans.dayflow.company.entity.Company company = null;
-        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
-            company = securityUser.getUser().getCompany();
-        }
 
         // Create user account (no password yet — invitation pending)
         User user = User.builder()
@@ -115,6 +124,18 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public Page<EmployeeResponse> getAllEmployees(Pageable pageable) {
+        return getAllEmployees(null, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EmployeeResponse> getAllEmployees(Authentication authentication, Pageable pageable) {
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            com.techtitans.dayflow.company.entity.Company company = securityUser.getUser().getCompany();
+            if (company != null) {
+                return employeeRepository.findAllByCompanyIdWithUser(company.getId(), pageable)
+                        .map(EmployeeResponse::from);
+            }
+        }
         return employeeRepository.findAllWithUser(pageable)
                 .map(EmployeeResponse::from);
     }

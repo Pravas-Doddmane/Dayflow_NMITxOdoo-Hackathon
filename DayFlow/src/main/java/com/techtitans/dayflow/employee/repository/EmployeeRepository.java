@@ -19,7 +19,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Optional<Employee> findByEmployeeCode(String employeeCode);
 
+    Optional<Employee> findByEmployeeCodeAndCompanyId(String employeeCode, Long companyId);
+
     boolean existsByEmployeeCode(String employeeCode);
+
+    boolean existsByEmployeeCodeAndCompanyId(String employeeCode, Long companyId);
+
+    @Query("SELECT e FROM Employee e JOIN FETCH e.user u JOIN FETCH u.role WHERE e.company.id = :companyId")
+    Page<Employee> findAllByCompanyIdWithUser(@org.springframework.data.repository.query.Param("companyId") Long companyId, Pageable pageable);
 
     @Query("SELECT e FROM Employee e JOIN FETCH e.user u JOIN FETCH u.role")
     Page<Employee> findAllWithUser(Pageable pageable);

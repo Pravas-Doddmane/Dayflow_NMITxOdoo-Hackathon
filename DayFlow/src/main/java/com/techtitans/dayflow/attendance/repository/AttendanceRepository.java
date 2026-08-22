@@ -4,6 +4,7 @@ import com.techtitans.dayflow.attendance.entity.Attendance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
 
     Optional<Attendance> findByEmployeeIdAndAttendanceDate(Long employeeId, LocalDate date);
 
@@ -27,15 +28,4 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("employeeId") Long employeeId,
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
-
-    @Query("SELECT a FROM Attendance a JOIN FETCH a.employee e WHERE " +
-           "(:employeeId IS NULL OR a.employee.id = :employeeId) " +
-           "AND (:from IS NULL OR a.attendanceDate >= :from) " +
-           "AND (:to IS NULL OR a.attendanceDate <= :to) " +
-           "ORDER BY a.attendanceDate DESC")
-    Page<Attendance> findAllByFilters(
-            @Param("employeeId") Long employeeId,
-            @Param("from") LocalDate from,
-            @Param("to") LocalDate to,
-            Pageable pageable);
 }

@@ -16,14 +16,16 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_users_email_company", columnNames = {"email", "company_id"})
+})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
 
     @Column(name = "password_hash", length = 255)

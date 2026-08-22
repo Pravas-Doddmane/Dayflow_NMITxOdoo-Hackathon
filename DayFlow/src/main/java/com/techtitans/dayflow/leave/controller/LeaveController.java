@@ -56,9 +56,10 @@ public class LeaveController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all leave requests (paginated, filterable by status)")
     public ResponseEntity<Page<LeaveResponse>> getAllLeaves(
+            Authentication authentication,
             @RequestParam(required = false) LeaveStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(leaveService.getAllLeaveRequests(status, pageable));
+        return ResponseEntity.ok(leaveService.getAllLeaveRequests(authentication, status, pageable));
     }
 
     @PutMapping("/api/admin/leaves/{id}/approve")

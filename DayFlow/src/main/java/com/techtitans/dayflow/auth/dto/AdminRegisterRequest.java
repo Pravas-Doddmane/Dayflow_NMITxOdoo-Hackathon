@@ -19,5 +19,9 @@ public record AdminRegisterRequest(
 
         String firstName,
 
-        String lastName
+        String lastName,
+
+        String phone,
+
+        String logoUrl
 ) {}

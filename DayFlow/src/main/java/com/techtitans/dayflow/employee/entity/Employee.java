@@ -19,7 +19,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "employees")
+@Table(name = "employees", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_employees_code_company", columnNames = {"employee_code", "company_id"})
+})
 public class Employee {
 
     @Id
@@ -34,7 +36,7 @@ public class Employee {
     @JoinColumn(name = "company_id")
     private com.techtitans.dayflow.company.entity.Company company;
 
-    @Column(name = "employee_code", nullable = false, unique = true, length = 50)
+    @Column(name = "employee_code", nullable = false, length = 50)
     private String employeeCode;
 
     @Column(name = "first_name", nullable = false, length = 100)
@@ -56,7 +58,7 @@ public class Employee {
     @Column(name = "gender", length = 20)
     private Gender gender;
 
-    @Column(name = "profile_picture_url", length = 500)
+    @Column(name = "profile_picture_url", columnDefinition = "TEXT")
     private String profilePictureUrl;
 
     @Column(name = "designation", length = 150)

@@ -60,14 +60,54 @@ public class LocalStorageService implements StorageService {
     @Override
     public void delete(String fileUrl) {
         try {
-            if (fileUrl != null && fileUrl.startsWith(baseUrl)) {
-                String relativePath = fileUrl.substring(baseUrl.length() + 1);
+            if (fileUrl != null) {
+                String relativePath = fileUrl;
+                if (fileUrl.startsWith("http")) {
+                    int uploadsIndex = fileUrl.indexOf("uploads/");
+                    if (uploadsIndex != -1) {
+                        relativePath = fileUrl.substring(uploadsIndex);
+                    }
+                }
                 Path filePath = Paths.get(uploadDir).resolve(relativePath.replace("uploads/", "")).toAbsolutePath().normalize();
                 Files.deleteIfExists(filePath);
                 log.info("Deleted file: {}", filePath);
             }
         } catch (IOException e) {
             log.warn("Could not delete file: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public org.springframework.core.io.Resource loadAsResource(String fileUrl) {
+        try {
+            String relativePath = fileUrl;
+            if (fileUrl != null && fileUrl.startsWith("http")) {
+                int uploadsIndex = fileUrl.indexOf("uploads/");
+                if (uploadsIndex != -1) {
+                    relativePath = fileUrl.substring(uploadsIndex);
+                }
+            }
+            if (relativePath == null) {
+                throw new com.techtitans.dayflow.common.exception.ResourceNotFoundException("File URL is null");
+            }
+
+            Path filePath = Paths.get(uploadDir).resolve(relativePath.replace("uploads/", "")).toAbsolutePath().normalize();
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            }
+
+            // Fallback: try direct path relative to project root
+            Path directPath = Paths.get(relativePath).toAbsolutePath().normalize();
+            resource = new org.springframework.core.io.UrlResource(directPath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            }
+
+            throw new com.techtitans.dayflow.common.exception.ResourceNotFoundException("File not found on storage: " + fileUrl);
+        } catch (Exception e) {
+            log.error("Error loading file resource: {}", e.getMessage());
+            throw new com.techtitans.dayflow.common.exception.ResourceNotFoundException("Could not read file: " + fileUrl);
         }
     }
 }

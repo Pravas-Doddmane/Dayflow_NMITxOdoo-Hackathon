@@ -75,6 +75,36 @@ public class DocumentService {
         log.info("Deleted document ID: {}", documentId);
     }
 
+    @Transactional(readOnly = true)
+    public Document getDocumentOrThrow(Long documentId) {
+        return documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document", "id", documentId));
+    }
+
+    @Transactional(readOnly = true)
+    public org.springframework.core.io.Resource loadDocumentFile(Long documentId, Authentication authentication) {
+        Document document = getDocumentOrThrow(documentId);
+
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            User currentUser = securityUser.getUser();
+            if (com.techtitans.dayflow.common.enums.RoleName.EMPLOYEE.equals(currentUser.getRole().getName())) {
+                Employee employee = employeeRepository.findByUserId(currentUser.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee profile not found"));
+                if (!document.getEmployee().getId().equals(employee.getId())) {
+                    throw new ForbiddenException("You are not authorized to download this document");
+                }
+            } else if (com.techtitans.dayflow.common.enums.RoleName.ADMIN.equals(currentUser.getRole().getName())) {
+                if (currentUser.getCompany() != null && document.getEmployee().getCompany() != null) {
+                    if (!currentUser.getCompany().getId().equals(document.getEmployee().getCompany().getId())) {
+                        throw new ForbiddenException("Document belongs to another organization");
+                    }
+                }
+            }
+        }
+
+        return storageService.loadAsResource(document.getFileUrl());
+    }
+
     // ==========================================
     // Employee: View own documents
     // ==========================================

@@ -178,8 +178,8 @@ docker compose down
 ```
 
 **Access URLs:**
-- Backend API: `http://localhost:8081` (or `8081` if overridden)
-- Swagger UI / OpenAPI Docs: `http://localhost:8080/swagger-ui.html`
+- Backend API: `http://localhost:8081` (or `8080` if overridden)
+- Swagger UI / OpenAPI Docs: `http://localhost:8081/swagger-ui.html`
 - PostgreSQL (external port): `localhost:5433` (`postgres` / `1234` / db: `dayflow`)
 
 ---
@@ -236,8 +236,8 @@ Import the included `DayFlow_HRMS.postman_collection.json` directly into Postman
    ```
 
 4. **Access**
-   - API: `http://localhost:8081`
-   - Swagger UI: `http://localhost:8081/swagger-ui.html`
+   - API: `http://localhost:8080`
+   - Swagger UI: `http://localhost:8080/swagger-ui.html`
 
 ---
 
@@ -311,7 +311,7 @@ The initial ADMIN is created by `DataSeeder` (ApplicationRunner) using `ADMIN_EM
 
 ### 1. Login as Admin
 ```bash
-curl -X POST http://localhost:8081/api/auth/login \
+curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@dayflow.local","password":"AdminPass@2024"}'
 ```
@@ -331,7 +331,7 @@ Response:
 
 ### 2. Create Employee (Admin)
 ```bash
-curl -X POST http://localhost:8081/api/admin/employees \
+curl -X POST http://localhost:8080/api/admin/employees \
   -H "Authorization: Bearer <admin-token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -348,7 +348,7 @@ curl -X POST http://localhost:8081/api/admin/employees \
 ### 3. Setup Password (Employee)
 ```bash
 # Token is from the invitation email
-curl -X POST http://localhost:8081/api/auth/setup-password \
+curl -X POST http://localhost:8080/api/auth/setup-password \
   -H "Content-Type: application/json" \
   -d '{
     "token": "<token-from-email>",
@@ -359,13 +359,13 @@ curl -X POST http://localhost:8081/api/auth/setup-password \
 
 ### 4. Check In (Employee)
 ```bash
-curl -X POST http://localhost:8081/api/attendance/check-in \
+curl -X POST http://localhost:8080/api/attendance/check-in \
   -H "Authorization: Bearer <employee-token>"
 ```
 
 ### 5. Apply for Leave (Employee)
 ```bash
-curl -X POST http://localhost:8081/api/leaves \
+curl -X POST http://localhost:8080/api/leaves \
   -H "Authorization: Bearer <employee-token>" \
   -H "Content-Type: application/json" \
   -d '{

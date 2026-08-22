@@ -17,4 +17,9 @@ public interface StorageService {
      * Delete a file by its URL/path.
      */
     void delete(String fileUrl);
+
+    /**
+     * Load a stored file as a Resource.
+     */
+    org.springframework.core.io.Resource loadAsResource(String fileUrl);
 }

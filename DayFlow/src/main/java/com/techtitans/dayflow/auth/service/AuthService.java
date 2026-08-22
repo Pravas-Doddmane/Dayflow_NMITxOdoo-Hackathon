@@ -57,10 +57,6 @@ public class AuthService {
         String email = request.email().trim().toLowerCase();
         String companyName = request.companyName().trim();
 
-        if (userRepository.existsByEmail(email)) {
-            throw new DuplicateResourceException("An account with email " + email + " already exists");
-        }
-
         if (companyRepository.existsByNameIgnoreCase(companyName)) {
             throw new DuplicateResourceException("A company with the name '" + companyName + "' is already registered");
         }
@@ -77,7 +73,12 @@ public class AuthService {
         Company company = companyRepository.save(Company.builder()
                 .name(companyName)
                 .code(code)
+                .logoUrl(request.logoUrl())
                 .build());
+
+        if (userRepository.existsByEmailAndCompanyId(email, company.getId())) {
+            throw new DuplicateResourceException("An account with email " + email + " already exists in " + companyName);
+        }
 
         Role adminRole = roleRepository.findByName(RoleName.ADMIN)
                 .orElseGet(() -> roleRepository.save(Role.builder()
@@ -91,20 +92,22 @@ public class AuthService {
                 .role(adminRole)
                 .company(company)
                 .accountStatus(AccountStatus.ACTIVE)
-                .emailVerified(false)
+                .emailVerified(true)
                 .build();
 
         userRepository.save(admin);
 
-        // Generate email verification token
-        String rawToken = tokenService.createToken(admin, TokenType.EMAIL_VERIFICATION);
+        // Generate email verification token (optional welcome/verify email)
+        try {
+            String rawToken = tokenService.createToken(admin, TokenType.EMAIL_VERIFICATION);
+            String emailBody = emailTemplateService.buildAdminRegistrationVerificationEmail(
+                    company.getName(), request.firstName(), rawToken);
+            emailService.sendHtmlEmail(admin.getEmail(), "Verify Your DayFlow Admin Account", emailBody);
+        } catch (Exception e) {
+            log.warn("Could not send admin verification email: {}", e.getMessage());
+        }
 
-        // Send verification email
-        String emailBody = emailTemplateService.buildAdminRegistrationVerificationEmail(
-                company.getName(), request.firstName(), rawToken);
-        emailService.sendHtmlEmail(admin.getEmail(), "Verify Your DayFlow Admin Account", emailBody);
-
-        log.info("Admin registered for company {} (email: {}). Verification email sent.", company.getName(), email);
+        log.info("Admin registered for company {} (email: {}).", company.getName(), email);
     }
 
     // ==========================================
@@ -210,7 +213,8 @@ public class AuthService {
 
     @Transactional
     public void forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findByEmail(request.email().trim().toLowerCase()).ifPresent(user -> {
+        String email = request.email().trim().toLowerCase();
+        userRepository.findAllByEmail(email).forEach(user -> {
             if (user.getAccountStatus() == AccountStatus.ACTIVE) {
                 String rawToken = tokenService.createToken(user, TokenType.PASSWORD_RESET);
 

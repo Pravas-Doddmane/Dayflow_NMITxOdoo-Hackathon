@@ -93,11 +93,34 @@ public class LeaveService {
 
     @Transactional(readOnly = true)
     public Page<LeaveResponse> getAllLeaveRequests(LeaveStatus status, Pageable pageable) {
-        if (status != null) {
-            return leaveRequestRepository.findByStatusOrderByCreatedAtDesc(status, pageable)
-                    .map(LeaveResponse::from);
+        return getAllLeaveRequests(null, status, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LeaveResponse> getAllLeaveRequests(Authentication authentication, LeaveStatus status, Pageable pageable) {
+        Long companyId = null;
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            if (securityUser.getUser().getCompany() != null) {
+                companyId = securityUser.getUser().getCompany().getId();
+            }
         }
-        return leaveRequestRepository.findAllByOrderByCreatedAtDesc(pageable)
+
+        final Long finalCompanyId = companyId;
+        org.springframework.data.jpa.domain.Specification<LeaveRequest> spec = (root, query, cb) -> {
+            if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
+                root.fetch("employee", jakarta.persistence.criteria.JoinType.INNER);
+            }
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            if (finalCompanyId != null) {
+                predicates.add(cb.equal(root.get("employee").get("company").get("id"), finalCompanyId));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        return leaveRequestRepository.findAll(spec, pageable)
                 .map(LeaveResponse::from);
     }
 
