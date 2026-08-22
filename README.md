@@ -1,3 +1,15 @@
+# Team Name: Tech Titans
+
+**Team Members:**
+- Charan G C
+- Gagan L K
+- Pannag Ragavendra Shet
+-  Pravas D S
+  
+**Video Link:** https://drive.google.com/file/d/19oZaZz_ArN4my_7e6fnX35Y6Shr-yekw/view
+
+---
+
 # DayFlow HRMS — Human Resource Management System
 
 A production-grade, enterprise Human Resource Management System (HRMS) built for the **TechTitans** team. DayFlow combines a high-performance **Spring Boot 4 / Java 21** RESTful API backend with a modern, responsive **React 19 / Vite / Tailwind CSS v4** Single Page Application (SPA) frontend.
