@@ -1,0 +1,103 @@
+services:
+  # =========================================================
+  # PostgreSQL Database Service
+  # =========================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: dayflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dayflow}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${POSTGRES_DB:-dayflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dayflow-network
+
+  # =========================================================
+  # DayFlow Spring Boot Backend Service
+  # =========================================================
+  backend:
+    build:
+      context: ./DayFlow
+      dockerfile: Dockerfile
+    container_name: dayflow-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8081}:8080"
+    environment:
+      # Server Port
+      SERVER_PORT: 8080
+
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-dayflow}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-dayflow}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-1234}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-1234}
+
+      # Security & JWT
+      JWT_SECRET: ${JWT_SECRET:-/cfnKLQlry52dsdUbQKThBWjkLhx1Jxun8DxV+bFrZM=}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+
+      # Admin Seed
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@dayflow.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminPass@2024}
+
+      # Mail Configuration
+      MAIL_USERNAME: ${MAIL_USERNAME:-53cpravas@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-xbavaqowampttvbl}
+
+      # Base URL & CORS
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5174}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5174,http://localhost:5173,http://localhost:3000}
+
+      # Upload directory (mounted volume inside container)
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - app_uploads:/app/uploads
+    networks:
+      - dayflow-network
+
+  # =========================================================
+  # DayFlow React Frontend Service (Nginx)
+  # =========================================================
+  frontend:
+    build:
+      context: ./DayFlowFrontend
+      dockerfile: Dockerfile
+      args:
+        # At build time the frontend JS bundle is compiled — API URL is baked in.
+        # Nginx proxy rewrites /api/* → backend:8080 so this can stay as "/api"
+        # relative, but for direct browser fetch we point to the backend port.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8081}
+    container_name: dayflow-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5174}:80"
+    networks:
+      - dayflow-network
+
+volumes:
+  postgres_data:
+    driver: local
+  app_uploads:
+    driver: local
+
+networks:
+  dayflow-network:
+    driver: bridge
