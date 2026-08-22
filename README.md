@@ -9,7 +9,7 @@
 - Pannag Ragavendra Shet
 -  Pravas D S
   
-**Video Link:** https://drive.google.com/file/d/19oZaZz_ArN4my_7e6fnX35Y6Shr-yekw/view
+**Video Link:** https://drive.google.com/file/d/1d_4mB-taz3nWCJBCSaCDwx2Seywl-IS8/view?usp=drive_link
 
 ---
 
