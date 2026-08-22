@@ -1,3 +1,6 @@
+# Odoo x NMIT Hackathon
+---
+
 # Team Name: Tech Titans
 
 **Team Members:**
