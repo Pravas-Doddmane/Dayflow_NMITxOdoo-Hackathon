@@ -126,8 +126,8 @@ export const AdminRegisterPage = () => {
     <div className="space-y-5">
       {/* Top App / Web Logo */}
       <div className="text-center space-y-1.5">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
-          <Zap className="w-6 h-6 fill-white/20" />
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-slate-800 p-2 border border-indigo-100 dark:border-indigo-900/40 shadow-md mb-1">
+          <img src="/group-discussions.png" alt="DayFlow" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Sign Up

@@ -19,6 +19,12 @@ import {
   CheckCircle2,
   Clock,
   Shield,
+  GraduationCap,
+  Globe,
+  HeartHandshake,
+  Sparkles,
+  ExternalLink,
+  Code2,
 } from 'lucide-react';
 import { employeeApi } from '../../api/employeeApi';
 import { attendanceApi } from '../../api/attendanceApi';
@@ -251,15 +257,15 @@ export const EmployeeDetailPage = () => {
             {employee.profilePictureUrl ? (
               <img
                 src={
-                  employee.profilePictureUrl.startsWith('http')
+                  employee.profilePictureUrl.startsWith('http') || employee.profilePictureUrl.startsWith('data:')
                     ? employee.profilePictureUrl
                     : `${BASE_URL}${employee.profilePictureUrl}`
                 }
                 alt={employee.fullName}
-                className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-indigo-500 shadow-md"
+                className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-indigo-500 shadow-md shrink-0"
               />
             ) : (
-              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-indigo-600/25">
+              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-indigo-600/25 shrink-0">
                 {getInitials(employee.fullName || employee.firstName)}
               </div>
             )}
@@ -291,6 +297,19 @@ export const EmployeeDetailPage = () => {
                   <span>{employee.email}</span>
                 </div>
               </div>
+
+              {employee.skills && (
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                  {employee.skills.split(',').map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 text-[10px] font-semibold"
+                    >
+                      {skill.trim()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -347,101 +366,288 @@ export const EmployeeDetailPage = () => {
 
       {/* 1. OVERVIEW TAB */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-          {/* Personal Information */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Personal Information
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-slate-400 block mb-1">First Name</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.firstName}
-                </span>
+        <div className="space-y-6 animate-fade-in">
+          {/* Top Row: Personal Info & Employment Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Personal Information */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  Personal & Contact Information
+                </h3>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Last Name</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.lastName}
-                </span>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-400 block mb-1">First Name</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.firstName}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Last Name</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.lastName}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Gender</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.gender || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Date of Birth</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {formatDate(employee.dateOfBirth)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Primary Phone</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.phone || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Account Email</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate block">
+                    {employee.email}
+                  </span>
+                </div>
+                {employee.alternateEmail && (
+                  <div className="col-span-2">
+                    <span className="text-slate-400 block mb-1">Alternate / Personal Email</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                      {employee.alternateEmail}
+                    </span>
+                  </div>
+                )}
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Gender</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.gender || '—'}
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <span className="text-slate-400 block mb-1">Residential Address</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {employee.address || 'No residential address recorded.'}
                 </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Date of Birth</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {formatDate(employee.dateOfBirth)}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Phone</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.phone || '—'}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Email</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.email}
-                </span>
+                {(employee.city || employee.state || employee.country || employee.postalCode) && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {employee.city && (
+                      <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        City: {employee.city}
+                      </span>
+                    )}
+                    {employee.state && (
+                      <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        State: {employee.state}
+                      </span>
+                    )}
+                    {employee.country && (
+                      <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        Country: {employee.country}
+                      </span>
+                    )}
+                    {employee.postalCode && (
+                      <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        ZIP: {employee.postalCode}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-              <span className="text-slate-400 block mb-1">Residential Address</span>
-              <span className="font-medium text-slate-700 dark:text-slate-300">
-                {employee.address || 'No residential address recorded.'}
-              </span>
+            {/* Employment & Account Info */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  Employment Details
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-400 block mb-1">Department</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.department || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Designation</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.designation || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Joining Date</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {formatDate(employee.joiningDate)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Employment Status</span>
+                  <StatusBadge status={employee.employmentStatus} />
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Account Status</span>
+                  <StatusBadge status={employee.accountStatus} />
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Email Verification</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                    {employee.emailVerified ? 'Verified' : 'Unverified'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                <span>System Record Created</span>
+                <span className="font-semibold text-slate-600 dark:text-slate-300">
+                  {formatDate(employee.createdAt)}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Employment & Account Info */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Employment Details
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs">
+          {/* Middle Row: Professional Bio, Skills, and Social Links */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                Employee Professional Bio & Self-Service Skills
+              </h3>
+            </div>
+
+            <div className="space-y-4">
               <div>
-                <span className="text-slate-400 block mb-1">Department</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.department || '—'}
-                </span>
+                <span className="text-xs text-slate-400 block mb-1 font-semibold">About Me / Bio</span>
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                  {employee.aboutMe || <span className="text-slate-400 italic">No bio added yet by employee.</span>}
+                </div>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Designation</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {employee.designation || '—'}
-                </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1.5 font-semibold">Technologies & Skill Set</span>
+                  {employee.skills ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {employee.skills.split(',').map((s, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 text-xs font-semibold"
+                        >
+                          {s.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">No skills listed.</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-xs text-slate-400 block font-semibold">Professional Portfolios</span>
+                  <div className="flex flex-col gap-2">
+                    {employee.linkedinUrl ? (
+                      <a
+                        href={employee.linkedinUrl.startsWith('http') ? employee.linkedinUrl : `https://${employee.linkedinUrl}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>LinkedIn Profile</span>
+                        <ExternalLink className="w-3 h-3 opacity-60" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400">LinkedIn: Not provided</span>
+                    )}
+
+                    {employee.githubUrl ? (
+                      <a
+                        href={employee.githubUrl.startsWith('http') ? employee.githubUrl : `https://${employee.githubUrl}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        <Code2 className="w-3.5 h-3.5" />
+                        <span>GitHub / Portfolio</span>
+                        <ExternalLink className="w-3 h-3 opacity-60" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400">GitHub / Portfolio: Not provided</span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Joining Date</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {formatDate(employee.joiningDate)}
-                </span>
+            </div>
+          </div>
+
+          {/* Bottom Row: Emergency Contact & Education Qualifications */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Emergency Contact */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <HeartHandshake className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  Emergency Contact Details
+                </h3>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Employment Status</span>
-                <StatusBadge status={employee.employmentStatus} />
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Account Status</span>
-                <StatusBadge status={employee.accountStatus} />
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Email Verification</span>
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                  {employee.emailVerified ? 'Verified' : 'Unverified'}
-                </span>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-400 block mb-1">Contact Person</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.emergencyContactName || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-1">Relationship</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.emergencyContactRelation || '—'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-slate-400 block mb-1">Emergency Phone</span>
+                  {employee.emergencyContactPhone ? (
+                    <a
+                      href={`tel:${employee.emergencyContactPhone}`}
+                      className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{employee.emergencyContactPhone}</span>
+                    </a>
+                  ) : (
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">—</span>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
-              System Record Created: {formatDate(employee.createdAt)}
+            {/* Education & Qualifications */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  Education & Qualifications
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div className="col-span-2 sm:col-span-1">
+                  <span className="text-slate-400 block mb-1">Highest Degree / Qualification</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.highestQualification || '—'}
+                  </span>
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <span className="text-slate-400 block mb-1">Institution / University</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {employee.institution || '—'}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -673,7 +879,7 @@ export const EmployeeDetailPage = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Basic Monthly Pay ($) *
+                Basic Monthly Pay (₹) *
               </label>
               <input
                 type="number"
@@ -681,6 +887,34 @@ export const EmployeeDetailPage = () => {
                 required
                 value={salaryForm.basicSalary}
                 onChange={(e) => setSalaryForm({ ...salaryForm, basicSalary: e.target.value })}
+                placeholder="50000"
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                House Rent Allowance (HRA ₹)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={salaryForm.hra}
+                onChange={(e) => setSalaryForm({ ...salaryForm, hra: e.target.value })}
+                placeholder="15000"
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Other Allowances (₹)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={salaryForm.allowances}
+                onChange={(e) => setSalaryForm({ ...salaryForm, allowances: e.target.value })}
                 placeholder="5000"
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
@@ -688,42 +922,14 @@ export const EmployeeDetailPage = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                House Rent Allowance (HRA)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={salaryForm.hra}
-                onChange={(e) => setSalaryForm({ ...salaryForm, hra: e.target.value })}
-                placeholder="1500"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Other Allowances
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={salaryForm.allowances}
-                onChange={(e) => setSalaryForm({ ...salaryForm, allowances: e.target.value })}
-                placeholder="500"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Monthly Deductions
+                Monthly Deductions (₹)
               </label>
               <input
                 type="number"
                 step="0.01"
                 value={salaryForm.deductions}
                 onChange={(e) => setSalaryForm({ ...salaryForm, deductions: e.target.value })}
-                placeholder="300"
+                placeholder="2500"
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>

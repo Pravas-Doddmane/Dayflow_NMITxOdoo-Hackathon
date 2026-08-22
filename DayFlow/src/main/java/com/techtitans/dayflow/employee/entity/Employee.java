@@ -51,6 +51,48 @@ public class Employee {
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
+    @Column(name = "city", length = 100)
+    private String city;
+
+    @Column(name = "state", length = 100)
+    private String state;
+
+    @Column(name = "country", length = 100)
+    private String country;
+
+    @Column(name = "postal_code", length = 50)
+    private String postalCode;
+
+    @Column(name = "alternate_email", length = 255)
+    private String alternateEmail;
+
+    @Column(name = "about_me", columnDefinition = "TEXT")
+    private String aboutMe;
+
+    @Column(name = "skills", columnDefinition = "TEXT")
+    private String skills;
+
+    @Column(name = "linkedin_url", length = 255)
+    private String linkedinUrl;
+
+    @Column(name = "github_url", length = 255)
+    private String githubUrl;
+
+    @Column(name = "emergency_contact_name", length = 150)
+    private String emergencyContactName;
+
+    @Column(name = "emergency_contact_relation", length = 100)
+    private String emergencyContactRelation;
+
+    @Column(name = "emergency_contact_phone", length = 50)
+    private String emergencyContactPhone;
+
+    @Column(name = "highest_qualification", length = 150)
+    private String highestQualification;
+
+    @Column(name = "institution", length = 200)
+    private String institution;
+
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 

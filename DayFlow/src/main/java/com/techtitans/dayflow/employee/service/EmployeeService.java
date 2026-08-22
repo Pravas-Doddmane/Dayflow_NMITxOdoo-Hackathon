@@ -214,9 +214,23 @@ public class EmployeeService {
         Employee employee = employeeRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee profile not found for current user"));
 
-        // Only allowed fields
+        // Only allowed self-service fields (official HR records remain immutable)
         if (request.phone() != null) employee.setPhone(request.phone());
         if (request.address() != null) employee.setAddress(request.address());
+        if (request.city() != null) employee.setCity(request.city());
+        if (request.state() != null) employee.setState(request.state());
+        if (request.country() != null) employee.setCountry(request.country());
+        if (request.postalCode() != null) employee.setPostalCode(request.postalCode());
+        if (request.alternateEmail() != null) employee.setAlternateEmail(request.alternateEmail());
+        if (request.aboutMe() != null) employee.setAboutMe(request.aboutMe());
+        if (request.skills() != null) employee.setSkills(request.skills());
+        if (request.linkedinUrl() != null) employee.setLinkedinUrl(request.linkedinUrl());
+        if (request.githubUrl() != null) employee.setGithubUrl(request.githubUrl());
+        if (request.emergencyContactName() != null) employee.setEmergencyContactName(request.emergencyContactName());
+        if (request.emergencyContactRelation() != null) employee.setEmergencyContactRelation(request.emergencyContactRelation());
+        if (request.emergencyContactPhone() != null) employee.setEmergencyContactPhone(request.emergencyContactPhone());
+        if (request.highestQualification() != null) employee.setHighestQualification(request.highestQualification());
+        if (request.institution() != null) employee.setInstitution(request.institution());
         if (request.profilePictureUrl() != null) employee.setProfilePictureUrl(request.profilePictureUrl());
 
         employee = employeeRepository.save(employee);

@@ -16,5 +16,6 @@ public record LeaveRequestDto(
         @NotNull(message = "End date is required")
         LocalDate endDate,
 
-        String remarks
+        String remarks,
+        String attachmentUrl
 ) {}

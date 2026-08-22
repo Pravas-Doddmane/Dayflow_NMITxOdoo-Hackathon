@@ -11,9 +11,11 @@ export const AuthLayout = () => {
       {/* Top Bar with Brand & Theme Toggle */}
       <header className="px-6 py-4 flex items-center justify-between z-20">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/25">
-            <Zap className="w-5 h-5 fill-white/20" />
-          </div>
+          <img
+            src="/group-discussions.png"
+            alt="DayFlow"
+            className="w-9 h-9 rounded-xl object-contain bg-indigo-50 dark:bg-slate-800 p-1 border border-indigo-100 dark:border-indigo-900/40 shadow-sm"
+          />
           <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
             Day<span className="text-indigo-600 dark:text-indigo-400">Flow</span>
           </span>

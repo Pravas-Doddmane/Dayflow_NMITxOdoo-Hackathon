@@ -7,11 +7,13 @@ import {
   CalendarDays,
   CreditCard,
   FileText,
+  Calendar,
   User,
   LogOut,
   Zap,
   Sparkles,
   ChevronRight,
+  Building2,
   X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -27,6 +29,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Attendance Logs', path: '/admin/attendance', icon: CalendarCheck },
     { name: 'Leave Requests', path: '/admin/leaves', icon: CalendarDays },
     { name: 'Salary & Payroll', path: '/admin/payroll', icon: CreditCard },
+    { name: 'Company Profile', path: '/admin/profile', icon: Building2 },
   ];
 
   const employeeLinks = [
@@ -36,6 +39,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Apply Leaves', path: '/employee/leaves', icon: CalendarDays },
     { name: 'My Salary', path: '/employee/salary', icon: CreditCard },
     { name: 'Documents', path: '/employee/documents', icon: FileText },
+    { name: 'Calendar', path: '/employee/calendar', icon: Calendar },
+    { name: 'Company Info', path: '/employee/company', icon: Building2 },
   ];
 
   const links = isAdmin ? adminLinks : employeeLinks;
@@ -64,9 +69,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
         <div>
           <div className="flex items-center justify-between h-16 px-6 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-                <Zap className="w-5 h-5 fill-white/20" />
-              </div>
+              <img
+                src="/group-discussions.png"
+                alt="DayFlow"
+                className="w-9 h-9 rounded-xl object-contain bg-indigo-50 dark:bg-slate-800 p-1 border border-indigo-100 dark:border-indigo-900/40 shadow-sm"
+              />
               <div>
                 <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
                   Day<span className="text-indigo-600 dark:text-indigo-400">Flow</span>

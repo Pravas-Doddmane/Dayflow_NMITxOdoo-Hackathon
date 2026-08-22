@@ -23,6 +23,7 @@ import { EmployeeDetailPage } from './pages/admin/EmployeeDetailPage';
 import { AttendanceManagementPage } from './pages/admin/AttendanceManagementPage';
 import { LeaveManagementPage } from './pages/admin/LeaveManagementPage';
 import { PayrollManagementPage } from './pages/admin/PayrollManagementPage';
+import { AdminProfilePage } from './pages/admin/AdminProfilePage';
 
 // Employee Pages
 import { EmployeeDashboard } from './pages/employee/EmployeeDashboard';
@@ -31,6 +32,8 @@ import { AttendanceHistoryPage } from './pages/employee/AttendanceHistoryPage';
 import { LeavePortalPage } from './pages/employee/LeavePortalPage';
 import { MySalaryPage } from './pages/employee/MySalaryPage';
 import { MyDocumentsPage } from './pages/employee/MyDocumentsPage';
+import { CalendarPage } from './pages/employee/CalendarPage';
+import { CompanyInfoPage } from './pages/employee/CompanyInfoPage';
 
 // 404
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -90,6 +93,7 @@ export default function App() {
           <Route path="attendance" element={<AttendanceManagementPage />} />
           <Route path="leaves" element={<LeaveManagementPage />} />
           <Route path="payroll" element={<PayrollManagementPage />} />
+          <Route path="profile" element={<AdminProfilePage />} />
         </Route>
 
         {/* Protected Employee Self-Service Routes */}
@@ -107,6 +111,8 @@ export default function App() {
           <Route path="leaves" element={<LeavePortalPage />} />
           <Route path="salary" element={<MySalaryPage />} />
           <Route path="documents" element={<MyDocumentsPage />} />
+          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="company" element={<CompanyInfoPage />} />
         </Route>
 
         {/* 404 Fallback */}

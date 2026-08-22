@@ -56,13 +56,13 @@ export const formatDateTime = (dateTimeStr) => {
 };
 
 /**
- * Format currency amount (e.g. "$1,250.00" or custom currency symbol)
+ * Format currency amount in Indian Rupees (e.g. "₹1,25,000.00")
  */
-export const formatCurrency = (amount, currency = 'USD') => {
+export const formatCurrency = (amount, currency = 'INR') => {
   if (amount === undefined || amount === null) return '—';
   const num = Number(amount);
   if (isNaN(num)) return amount;
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,

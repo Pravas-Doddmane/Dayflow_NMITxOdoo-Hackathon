@@ -10,6 +10,7 @@ import {
   Briefcase,
   ChevronDown,
   Menu,
+  Building2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -139,18 +140,43 @@ export const Navbar = ({ onToggleSidebar }) => {
                 </span>
               </div>
 
-              {!isAdmin && (
+              {isAdmin ? (
                 <button
                   type="button"
                   onClick={() => {
                     setDropdownOpen(false);
-                    navigate('/employee/profile');
+                    navigate('/admin/profile');
                   }}
                   className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors"
                 >
-                  <User className="w-4 h-4 text-slate-400" />
-                  My Profile
+                  <Building2 className="w-4 h-4 text-indigo-500" />
+                  Company & Admin Profile
                 </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/employee/profile');
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors"
+                  >
+                    <User className="w-4 h-4 text-slate-400" />
+                    My Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/employee/company');
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors"
+                  >
+                    <Building2 className="w-4 h-4 text-indigo-500" />
+                    About Company
+                  </button>
+                </>
               )}
 
               <button

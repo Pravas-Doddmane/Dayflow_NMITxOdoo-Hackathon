@@ -83,7 +83,7 @@ class LeaveServiceTest {
         when(employeeRepository.findByUserId(1L)).thenReturn(Optional.of(employee));
         LocalDate start = LocalDate.now().plusDays(1);
         LocalDate end = LocalDate.now().plusDays(3);
-        LeaveRequestDto dto = new LeaveRequestDto(LeaveType.PAID, start, end, "Vacation");
+        LeaveRequestDto dto = new LeaveRequestDto(LeaveType.PAID, start, end, "Vacation", null);
 
         when(leaveRequestRepository.existsOverlappingLeave(1L, start, end)).thenReturn(false);
         LeaveRequest saved = LeaveRequest.builder()
@@ -105,7 +105,7 @@ class LeaveServiceTest {
         LocalDate end = LocalDate.now().plusDays(2);
 
         assertThatThrownBy(() -> leaveService.applyForLeave(employeeAuth,
-                new LeaveRequestDto(LeaveType.SICK, start, end, null)))
+                new LeaveRequestDto(LeaveType.SICK, start, end, null, null)))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Start date must be before");
     }

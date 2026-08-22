@@ -1,61 +1,116 @@
 # DayFlow HRMS — Human Resource Management System
 
-A production-quality Spring Boot backend for a full-featured HRMS, built for the **TechTitans** team.
+A production-quality Spring Boot backend for **DayFlow HRMS**, a full-featured Human Resource Management System built for the **TechTitans** team.
+
+DayFlow offers enterprise-grade employee management, multi-company/tenant profile support, automated email workflows, token-based self-onboarding, real-time attendance tracking, leave lifecycle processing, payroll management, and secure document vaults.
 
 ---
 
 ## 📋 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Language | Java 21 |
-| Framework | Spring Boot 4.1.1 |
-| Security | Spring Security 7 + JWT (Nimbus) |
-| Database | PostgreSQL |
-| ORM | Spring Data JPA / Hibernate |
-| Migrations | Flyway |
-| Build | Maven |
-| Email | Spring Boot Mail (Gmail SMTP) |
-| API Docs | SpringDoc OpenAPI 2.x (Swagger UI) |
-| Testing | JUnit 5 + Mockito |
+| Layer / Concern | Technology | Description |
+|---|---|---|
+| **Language** | Java 21 | Modern LTS Java runtime |
+| **Framework** | Spring Boot 4.1.1 | Enterprise application framework |
+| **Security** | Spring Security 7 + OAuth2 Resource Server | Stateless authentication & role-based authorization |
+| **JWT Engine** | Nimbus JOSE + JWT | Cryptographically signed HMAC-SHA256 tokens |
+| **Database** | PostgreSQL 14+ | Relational data store |
+| **ORM / Data Access** | Spring Data JPA / Hibernate | Object-relational mapping & repository abstractions |
+| **Database Migrations** | Flyway Core + PostgreSQL | Version-controlled, deterministic database schema |
+| **Build & Dependency Tool** | Apache Maven 3.9+ (with Maven Wrapper `mvnw`) | Project build and lifecycle management |
+| **Email Service** | Spring Boot Starter Mail | Transactional email notifications via SMTP (Gmail) |
+| **API Documentation** | SpringDoc OpenAPI 2.8.9 (Swagger UI) | Interactive REST API explorer and schema docs |
+| **Testing** | JUnit 5 + Mockito + H2 In-Memory DB | Comprehensive unit & integration testing |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Package Structure
 
 ```
 com.techtitans.dayflow
 │
-├── DayFlowApplication.java      # Entry point
-├── config/                      # Spring configuration
-│   ├── SecurityConfig.java      # Spring Security 7 config
-│   ├── OpenApiConfig.java       # Swagger UI config
-│   └── DataSeeder.java          # Initial admin seed
+├── DayFlowApplication.java          # Spring Boot main entry point
 │
-├── security/                    # JWT + UserDetails
-│   ├── JwtService.java          # Nimbus JOSE JWT
-│   ├── JwtAuthenticationFilter.java
-│   ├── CustomUserDetailsService.java
-│   └── SecurityUser.java
+├── config/                          # Application & Security configuration
+│   ├── SecurityConfig.java          # Spring Security 7 filter chain & CORS config
+│   ├── OpenApiConfig.java           # Swagger / OpenAPI documentation configuration
+│   └── DataSeeder.java              # Initial system admin seeder (ApplicationRunner)
 │
-├── auth/                        # Authentication module
-├── user/                        # User + Role entities
-├── employee/                    # Employee management
-├── attendance/                  # Check-in/out
-├── leave/                       # Leave requests
-├── salary/                      # Salary structures
-├── document/                    # Document management
-├── notification/                # Email service
-└── common/                      # Enums, exceptions, DTOs
+├── security/                        # Security infrastructure
+│   ├── JwtService.java              # Nimbus JOSE JWT generation, signing & extraction
+│   ├── JwtAuthenticationFilter.java # Bearer token extraction & SecurityContext setup
+│   ├── CustomUserDetailsService.java# User lookup by email/company
+│   └── SecurityUser.java            # Spring Security UserDetails adapter
+│
+├── auth/                            # Authentication & Onboarding module
+│   ├── controller/                  # Public auth & onboarding REST endpoints
+│   ├── dto/                         # Login, Registration, Password setup/reset DTOs
+│   ├── entity/                      # AuthToken entity (invitations, email verify, password reset)
+│   ├── repository/                  # AuthTokenRepository
+│   └── service/                     # AuthService (token hashing, email dispatch, credential verify)
+│
+├── company/                         # Company & Organization Profile module
+│   ├── controller/                  # Company profile REST endpoints
+│   ├── dto/                         # Company profile request/response DTOs
+│   ├── entity/                      # Company entity
+│   ├── repository/                  # CompanyRepository
+│   └── service/                     # CompanyService
+│
+├── user/                            # User & Role module
+│   ├── entity/                      # User & Role entities
+│   └── repository/                  # UserRepository & RoleRepository
+│
+├── employee/                        # Employee management & Profile module
+│   ├── controller/                  # AdminEmployeeController & EmployeeProfileController
+│   ├── dto/                         # Employee creation, update & profile DTOs
+│   ├── entity/                      # Employee entity (personal, job & contact info)
+│   ├── repository/                  # EmployeeRepository
+│   └── service/                     # EmployeeService
+│
+├── attendance/                      # Attendance tracking module
+│   ├── controller/                  # AttendanceController (Check-in, check-out, history)
+│   ├── dto/                         # Attendance DTOs & response mappings
+│   ├── entity/                      # Attendance entity
+│   ├── repository/                  # AttendanceRepository
+│   └── service/                     # AttendanceService
+│
+├── leave/                           # Leave management module
+│   ├── controller/                  # LeaveController (Apply, review, approve/reject)
+│   ├── dto/                         # LeaveRequestDto, LeaveResponse, LeaveReviewRequest
+│   ├── entity/                      # LeaveRequest entity
+│   ├── repository/                  # LeaveService & LeaveRequestRepository
+│   └── service/                     # LeaveService
+│
+├── salary/                          # Payroll & Compensation module
+│   ├── controller/                  # SalaryController
+│   ├── dto/                         # SalaryRequest & SalaryResponse DTOs
+│   ├── entity/                      # SalaryStructure entity
+│   ├── repository/                  # SalaryStructureRepository
+│   └── service/                     # SalaryService
+│
+├── document/                        # Document vault & file storage module
+│   ├── controller/                  # DocumentController (Upload, list, download, delete)
+│   ├── dto/                         # DocumentResponse DTO
+│   ├── entity/                      # Document entity
+│   ├── repository/                  # DocumentRepository
+│   └── service/                     # DocumentService & file storage engine
+│
+├── notification/                    # Email notification module
+│   └── service/                     # EmailService (invitation emails, reset emails, templates)
+│
+└── common/                          # Cross-cutting concerns & shared utilities
+    ├── enums/                       # AccountStatus, AttendanceStatus, LeaveType, LeaveStatus, etc.
+    ├── exception/                   # Custom exceptions (ResourceNotFound, Conflict, Unauthorized, etc.)
+    └── handler/                     # GlobalExceptionHandler (@ControllerAdvice)
 ```
 
 ---
 
-## 🗄️ Database Design
+## 🗄️ Database Schema & Relationships
 
 ```
-roles
-  └── users (role_id FK)
+companies
+  └── users (company_id FK, role_id FK)
         └── employees (user_id FK, 1:1)
               ├── auth_tokens (user_id FK)
               ├── attendance (employee_id FK)
@@ -64,354 +119,279 @@ roles
               └── documents (employee_id FK)
 ```
 
-**Key constraints:**
-- `users.email` — UNIQUE, NOT NULL
-- `employees.employee_code` — UNIQUE, NOT NULL
-- `employees.user_id` — UNIQUE (1:1 relationship)
-- `attendance(employee_id, attendance_date)` — UNIQUE (one record per day)
-- `auth_tokens.token_hash` — UNIQUE, hashed with SHA-256
+### Key Database Constraints:
+- **`companies.name`** / **`companies.company_code`** — Identified company profile.
+- **`users(email, company_id)`** — Unique email scoped per company.
+- **`employees.employee_code`** — Unique employee identifier within the organization.
+- **`employees.user_id`** — Unique 1:1 relationship between User account and Employee profile.
+- **`attendance(employee_id, attendance_date)`** — Composite Unique constraint (maximum 1 attendance record per employee per calendar date).
+- **`auth_tokens.token_hash`** — Cryptographically hashed token with SHA-256 (unique, single-use, time-bound).
 
 ---
 
-## 🔐 Authentication Flow
+## 🌱 Flyway Migrations
 
-### JWT Structure
-```json
-{
-  "sub": "1",          // userId
-  "userId": 1,
-  "role": "EMPLOYEE",
-  "employeeId": 5,
-  "iat": 1234567890,
-  "exp": 1234654290
-}
+Database schema versioning is managed automatically via Flyway located in `src/main/resources/db/migration/`:
+
+| Version | Migration Script | Description |
+|---|---|---|
+| `V1` | `V1__create_roles.sql` | Creates the `roles` lookup table (`ADMIN`, `EMPLOYEE`). |
+| `V2` | `V2__create_users.sql` | Creates the `users` credentials table. |
+| `V3` | `V3__create_employees.sql` | Creates the `employees` master profile table. |
+| `V4` | `V4__create_auth_tokens.sql` | Creates `auth_tokens` for invitations, password resets, and verification. |
+| `V5` | `V5__create_attendance.sql` | Creates `attendance` ledger table. |
+| `V6` | `V6__create_leave_requests.sql` | Creates `leave_requests` table with review metadata. |
+| `V7` | `V7__create_salary_structures.sql` | Creates `salary_structures` table for compensation management. |
+| `V8` | `V8__create_documents.sql` | Creates `documents` metadata table for uploaded employee files. |
+| `V9` | `V9__seed_roles.sql` | Seeds initial `ADMIN` and `EMPLOYEE` role records. |
+| `V10` | `V10__create_companies.sql` | Creates `companies` table for organization-level profiles. |
+| `V11` | `V11__allow_same_email_multiple_companies.sql` | Adds `company_id` foreign key to `users` and adjusts scoping. |
+| `V12` | `V12__drop_old_unique_email_constraints.sql` | Drops legacy global unique email constraint in favor of per-company unique index. |
+
+---
+
+## 🔐 Authentication & Onboarding Lifecycle
+
+### 1. Admin & Company Self-Registration Flow
+```
+POST /api/auth/register-admin (Company info + Admin credentials)
+    ↓
+Company & Admin User record created in PENDING verification state
+    ↓
+Verification email dispatched with secure token (valid 24h)
+    ↓
+Admin clicks email link: /verify-email?token=...
+    ↓
+POST /api/auth/verify-email → Account status becomes ACTIVE
 ```
 
-### Employee Onboarding Flow
+### 2. Employee Invitation Flow
 ```
-ADMIN LOGIN
+ADMIN LOGIN (JWT with ADMIN role)
     ↓
-POST /api/admin/employees  (creates user + employee record)
+POST /api/admin/employees (Admin specifies employee name, email, designation, department)
     ↓
-Invitation email sent (token valid 48h)
+User created (status: INVITED) + Employee profile initialized
+    ↓
+Invitation email sent with single-use setup token (valid 48h)
     ↓
 Employee clicks: /setup-password?token=...
     ↓
-POST /api/auth/setup-password
+POST /api/auth/setup-password (Sets new password)
     ↓
-Account status: INVITED → ACTIVE
+Account status transitions: INVITED → ACTIVE
     ↓
-POST /api/auth/login  (returns JWT)
+POST /api/auth/login → Returns JWT token
 ```
 
-### Token Security
-- Tokens generated with `SecureRandom` (256-bit)
-- Stored as **SHA-256 hashes** — raw token only in email
-- Single-use (marked `used_at` after consumption)
-- Configurable expiry per type
-
----
-
-## 📧 Email Setup
-
-Uses Gmail SMTP with App Passwords.
-
-### Get a Gmail App Password
-1. Enable 2-Step Verification on your Gmail account
-2. Go to: https://myaccount.google.com/apppasswords
-3. Create an App Password for "Mail"
-4. Use this password as `MAIL_PASSWORD`
+### 3. JWT Payload Structure
+```json
+{
+  "sub": "1",
+  "userId": 1,
+  "role": "EMPLOYEE",
+  "employeeId": 5,
+  "iat": 1740220000,
+  "exp": 1740306400
+}
+```
 
 ---
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file from `.env.example`:
+Create a `.env` file in the `DayFlow` root directory from `.env.example`:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DB_URL` | PostgreSQL JDBC URL | `jdbc:postgresql://localhost:5432/dayflow` |
-| `DB_USERNAME` | PostgreSQL username | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `yourpassword` |
-| `JWT_SECRET` | JWT signing key (256-bit min) | `openssl rand -base64 64` |
-| `JWT_EXPIRATION_MS` | Token expiry in ms | `86400000` (24h) |
-| `MAIL_USERNAME` | Gmail address | `yourname@gmail.com` |
-| `MAIL_PASSWORD` | Gmail App Password | `xxxx xxxx xxxx xxxx` |
-| `APP_BASE_URL` | Base URL for email links | `http://localhost:5173` |
-| `ADMIN_EMAIL` | Initial admin email | `admin@dayflow.local` |
-| `ADMIN_PASSWORD` | Initial admin password | `AdminPass@2024` |
-| `UPLOAD_DIR` | File upload directory | `./uploads` |
-| `CORS_ALLOWED_ORIGINS` | Comma-separated origins | `http://localhost:5173` |
-
----
-
-## 🐘 PostgreSQL Setup
-
-```sql
--- Create database
-CREATE DATABASE dayflow;
-
--- Create user (optional)
-CREATE USER dayflow_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE dayflow TO dayflow_user;
-```
+| Variable | Description | Default / Example Value |
+|---|---|---|
+| `DB_URL` | PostgreSQL JDBC connection URL | `jdbc:postgresql://localhost:5432/dayflow` |
+| `DB_USERNAME` | PostgreSQL database user | `postgres` |
+| `DB_PASSWORD` | PostgreSQL database password | `1234` |
+| `JWT_SECRET` | 256-bit min Base64 HMAC secret key | `/cfnKLQlry52dsdUbQKThBWjkLhx1Jxun8DxV+bFrZM=` |
+| `JWT_EXPIRATION_MS` | JWT validity duration (milliseconds) | `86400000` (24 hours) |
+| `MAIL_USERNAME` | SMTP Gmail address | `your-email@gmail.com` |
+| `MAIL_PASSWORD` | SMTP Gmail App Password (16 characters) | `xxxx xxxx xxxx xxxx` |
+| `APP_BASE_URL` | Frontend URL for email verification/setup links | `http://localhost:5173` |
+| `ADMIN_EMAIL` | Default seeded admin email | `admin@dayflow.local` |
+| `ADMIN_PASSWORD` | Default seeded admin password | `AdminPass@2024` |
+| `UPLOAD_DIR` | Directory where employee files are saved | `./uploads` |
+| `TOKEN_SETUP_EXPIRY_HOURS` | Expiration for employee invitation token | `48` |
+| `TOKEN_RESET_EXPIRY_HOURS` | Expiration for password reset token | `1` |
+| `TOKEN_EMAIL_VERIFY_EXPIRY_HOURS`| Expiration for admin email verification token | `24` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated allowed frontend origins | `http://localhost:5173,http://localhost:3000` |
 
 ---
 
 ## 🐳 Running with Docker (Recommended)
 
-Run the entire system (PostgreSQL 16 + DayFlow Spring Boot backend) in one command:
+You can launch both the PostgreSQL 16 database and the DayFlow Spring Boot application using Docker Compose:
 
 ```bash
-# 1. Start containers
+# 1. Build and start containers in detached mode
 docker compose up -d --build
 
-# 2. View backend logs
+# 2. Inspect application logs
 docker compose logs -f backend
 
-# 3. Stop containers
+# 3. Stop containers and networks
 docker compose down
 ```
 
-**Access URLs:**
-- Backend API: `http://localhost:8081` (or `8080` if overridden)
-- Swagger UI / OpenAPI Docs: `http://localhost:8081/swagger-ui.html`
-- PostgreSQL (external port): `localhost:5433` (`postgres` / `1234` / db: `dayflow`)
-
----
-
-## 📮 Postman API Testing
-
-Import the included `DayFlow_HRMS.postman_collection.json` directly into Postman:
-
-1. Open **Postman** -> Click **Import** -> Select `DayFlow_HRMS.postman_collection.json`.
-2. The collection has pre-configured environment variables:
-   - `base_url`: `http://localhost:8081` (Docker) or `http://localhost:8080` (Local)
-   - `admin_token`: Automatically captured when running **Admin Login**.
-   - `employee_token`: Automatically captured when running **Employee Login**.
-   - `created_employee_id`: Automatically captured on employee creation.
-3. Test all endpoints across the 7 modules:
-   - 1. **Authentication** (Admin Login, Setup Password, Forgot/Reset Password)
-   - 2. **Admin - Employee Management** (Create, List, View, Update, Status)
-   - 3. **Employee Profile** (View profile, Update contact info)
-   - 4. **Attendance Management** (Check-in, Check-out, History)
-   - 5. **Leave Management** (Apply, View, Admin Approve/Reject)
-   - 6. **Salary Management** (Create structure, View salary history)
-   - 7. **Document Management** (Upload documents, View, Delete)
+**Service Endpoints:**
+- **Backend API**: `http://localhost:8081`
+- **Swagger UI API Docs**: `http://localhost:8081/swagger-ui.html`
+- **PostgreSQL Database**: `localhost:5433` (User: `postgres` / Password: `1234` / DB: `dayflow`)
 
 ---
 
 ## 🚀 Running Locally (Without Docker)
 
 ### Prerequisites
-- Java 21 (`jdk-21.0.8.9-hotspot`)
-- PostgreSQL 14+
-- Maven 3.9+ (or use included `mvnw`)
+- **Java**: JDK 21 (e.g. Eclipse Adoptium OpenJDK 21)
+- **PostgreSQL**: PostgreSQL 14 or higher running on port `5432`
+- **Maven**: 3.9+ (or use the included `./mvnw` / `mvnw.cmd` wrapper)
 
-### Steps
+### Step-by-Step Setup
 
-1. **Configure environment in `.env`**
-   ```bash
-   cp .env.example .env
+1. **Create the PostgreSQL Database:**
+   ```sql
+   CREATE DATABASE dayflow;
    ```
 
-2. **Set environment variables (PowerShell)**
+2. **Configure Environment Variables (PowerShell example):**
    ```powershell
    $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
    $env:DB_URL = "jdbc:postgresql://localhost:5432/dayflow"
    $env:DB_USERNAME = "postgres"
    $env:DB_PASSWORD = "1234"
    $env:JWT_SECRET = "/cfnKLQlry52dsdUbQKThBWjkLhx1Jxun8DxV+bFrZM="
+   $env:MAIL_USERNAME = "your-email@gmail.com"
+   $env:MAIL_PASSWORD = "your-gmail-app-password"
    $env:ADMIN_EMAIL = "admin@dayflow.local"
    $env:ADMIN_PASSWORD = "AdminPass@2024"
    ```
 
-3. **Run**
+3. **Start the Spring Boot Server:**
    ```powershell
    .\mvnw.cmd spring-boot:run
    ```
+   *(On Linux/macOS: `./mvnw spring-boot:run`)*
 
-4. **Access**
-   - API: `http://localhost:8080`
-   - Swagger UI: `http://localhost:8080/swagger-ui.html`
-
----
-
-## 🌱 Flyway Migrations
-
-Flyway runs automatically on startup. Migrations are in:
-```
-src/main/resources/db/migration/
-├── V1__create_roles.sql
-├── V2__create_users.sql
-├── V3__create_employees.sql
-├── V4__create_auth_tokens.sql
-├── V5__create_attendance.sql
-├── V6__create_leave_requests.sql
-├── V7__create_salary_structures.sql
-├── V8__create_documents.sql
-└── V9__seed_roles.sql
-```
-
-The initial ADMIN is created by `DataSeeder` (ApplicationRunner) using `ADMIN_EMAIL` and `ADMIN_PASSWORD` env vars.
+4. **Verify Application Startup:**
+   - Server runs on: `http://localhost:8081`
+   - Interactive Swagger Docs: `http://localhost:8081/swagger-ui.html`
+   - OpenAPI Schema JSON: `http://localhost:8081/api-docs`
 
 ---
 
-## 📡 API Endpoints
+## 📡 Complete REST API Reference
 
-### Auth (Public)
+### 1. Authentication Endpoints (Public)
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login` | Login, returns JWT |
-| POST | `/api/auth/setup-password` | Set password via invitation token |
-| POST | `/api/auth/verify-email?token=...` | Verify email |
-| POST | `/api/auth/forgot-password` | Request password reset |
-| POST | `/api/auth/reset-password` | Reset password via token |
+|---|---|---|
+| `POST` | `/api/auth/register-admin` | Register a new company and admin account (sends verification email). |
+| `POST` | `/api/auth/verify-email?token=...` | Verify email address using token. |
+| `POST` | `/api/auth/login` | Authenticate with email and password; returns JWT token. |
+| `POST` | `/api/auth/setup-password` | Set initial password using invitation token from email. |
+| `POST` | `/api/auth/forgot-password` | Request a password reset link. |
+| `POST` | `/api/auth/reset-password` | Reset password using the reset token. |
 
-### Employee (EMPLOYEE role)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/employees/me` | Own profile |
-| PUT | `/api/employees/me` | Update phone/address/picture |
-| POST | `/api/attendance/check-in` | Check in |
-| POST | `/api/attendance/check-out` | Check out |
-| GET | `/api/attendance/me` | Own attendance |
-| POST | `/api/leaves` | Apply for leave |
-| GET | `/api/leaves/me` | Own leave requests |
-| GET | `/api/salary/me` | Own salary (read-only) |
-| GET | `/api/documents/me` | Own documents |
+### 2. Company Profile Endpoints
+| Method | Endpoint | Role | Description |
+|---|---|---|---|
+| `GET` | `/api/company/profile` | `ADMIN`, `EMPLOYEE` | Get company profile details (name, code, address, policy). |
+| `PUT` | `/api/admin/company/profile` | `ADMIN` | Update company information, address, and branding. |
 
-### Admin (ADMIN role)
+### 3. Employee Self-Service Endpoints (`EMPLOYEE` Role)
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/admin/employees` | Create employee |
-| GET | `/api/admin/employees` | List employees (paginated) |
-| GET | `/api/admin/employees/{id}` | Get employee |
-| PUT | `/api/admin/employees/{id}` | Update employee |
-| PATCH | `/api/admin/employees/{id}/status` | Change account status |
-| GET | `/api/admin/attendance` | All attendance (paginated) |
-| GET | `/api/admin/attendance/employee/{id}` | Employee attendance |
-| GET | `/api/admin/leaves` | All leave requests |
-| PUT | `/api/admin/leaves/{id}/approve` | Approve leave |
-| PUT | `/api/admin/leaves/{id}/reject` | Reject leave |
-| GET | `/api/admin/salary/employee/{id}` | Employee salary history |
-| POST | `/api/admin/salary/employee/{id}` | Create salary structure |
-| PUT | `/api/admin/salary/{id}` | Update salary structure |
-| GET | `/api/admin/documents/employee/{id}` | Employee documents |
-| POST | `/api/admin/documents/employee/{id}` | Upload document |
-| DELETE | `/api/admin/documents/{id}` | Delete document |
+|---|---|---|
+| `GET` | `/api/employees/me` | Retrieve own employee profile. |
+| `PUT` | `/api/employees/me` | Update personal contact info (phone, address, avatar). |
+| `POST` | `/api/attendance/check-in` | Clock in for the current working day. |
+| `POST` | `/api/attendance/check-out` | Clock out for the current working day. |
+| `GET` | `/api/attendance/me` | Retrieve own attendance history (optional `from` and `to` date filters). |
+| `POST` | `/api/leaves` | Submit a new leave request (`PAID`, `SICK`, `UNPAID`). |
+| `GET` | `/api/leaves/me` | List all personal leave requests and approval statuses. |
+| `GET` | `/api/salary/me` | View own salary structure and compensation breakdown. |
+| `GET` | `/api/documents/me` | List all personal uploaded documents. |
+| `GET` | `/api/documents/{documentId}/download`| Download document file (`PDF`, `PNG`, `JPEG`, etc.). |
+
+### 4. Admin Management Endpoints (`ADMIN` Role)
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/admin/employees` | Create employee record and dispatch invitation email. |
+| `GET` | `/api/admin/employees` | Get paginated list of all organization employees. |
+| `GET` | `/api/admin/employees/{id}` | Get complete profile of an employee by ID. |
+| `PUT` | `/api/admin/employees/{id}` | Update employee job, department, designation, or personal info. |
+| `PATCH`| `/api/admin/employees/{id}/status` | Toggle employee account status (`ACTIVE` / `DISABLED`). |
+| `GET` | `/api/admin/attendance` | View organization-wide attendance records (paginated, date filters). |
+| `GET` | `/api/admin/attendance/employee/{employeeId}` | View attendance history for a specific employee. |
+| `GET` | `/api/admin/leaves` | List all leave requests across the company (filterable by `status`). |
+| `PUT` | `/api/admin/leaves/{id}/approve` | Approve an employee leave request with optional review notes. |
+| `PUT` | `/api/admin/leaves/{id}/reject` | Reject an employee leave request with review reason. |
+| `GET` | `/api/admin/salary/employee/{employeeId}` | Get salary structure history for an employee. |
+| `POST` | `/api/admin/salary/employee/{employeeId}` | Create new salary structure for an employee. |
+| `PUT` | `/api/admin/salary/{salaryId}` | Update an existing salary structure. |
+| `POST` | `/api/admin/documents/employee/{employeeId}` | Upload a document for an employee (Multipart `file` + `documentType`). |
+| `GET` | `/api/admin/documents/employee/{employeeId}` | List all documents belonging to an employee. |
+| `DELETE`| `/api/admin/documents/{documentId}` | Delete an uploaded document. |
 
 ---
 
-## 🧪 Testing with cURL/Postman
+## 🧪 Testing & Quality Assurance
 
-### 1. Login as Admin
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@dayflow.local","password":"AdminPass@2024"}'
-```
-
-Response:
-```json
-{
-  "token": "eyJ...",
-  "tokenType": "Bearer",
-  "expiresIn": 86400,
-  "userId": 1,
-  "employeeId": null,
-  "role": "ADMIN",
-  "email": "admin@dayflow.local"
-}
-```
-
-### 2. Create Employee (Admin)
-```bash
-curl -X POST http://localhost:8080/api/admin/employees \
-  -H "Authorization: Bearer <admin-token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "employeeCode": "EMP001",
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "email": "jane.smith@company.com",
-    "designation": "Software Engineer",
-    "department": "Engineering",
-    "joiningDate": "2026-08-22"
-  }'
-```
-
-### 3. Setup Password (Employee)
-```bash
-# Token is from the invitation email
-curl -X POST http://localhost:8080/api/auth/setup-password \
-  -H "Content-Type: application/json" \
-  -d '{
-    "token": "<token-from-email>",
-    "newPassword": "SecurePass@123",
-    "confirmPassword": "SecurePass@123"
-  }'
-```
-
-### 4. Check In (Employee)
-```bash
-curl -X POST http://localhost:8080/api/attendance/check-in \
-  -H "Authorization: Bearer <employee-token>"
-```
-
-### 5. Apply for Leave (Employee)
-```bash
-curl -X POST http://localhost:8080/api/leaves \
-  -H "Authorization: Bearer <employee-token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "leaveType": "PAID",
-    "startDate": "2026-09-01",
-    "endDate": "2026-09-05",
-    "remarks": "Annual vacation"
-  }'
-```
-
----
-
-## 🧪 Running Tests
-
+### Run Automated Unit & Integration Tests:
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
 .\mvnw.cmd clean test
 ```
 
-**Test coverage:**
-- ✅ AuthService: 11 tests (login, setup-password, verify-email, forgot-password, reset-password)
-- ✅ AttendanceService: 5 tests (check-in, check-out, duplicates, ordering)
-- ✅ EmployeeService: 4 tests (create, duplicates, not-found)
-- ✅ LeaveService: 6 tests (apply, approve, reject, business rules)
-- ✅ SalaryService: 3 tests (create, view, validation)
-- ✅ ApplicationTest: 1 test
-
-**Total: 30 tests, all passing**
+**Test Coverage Summary:**
+- **`AuthServiceTest`**: Login validation, account statuses, password setup, email verification, password resets.
+- **`EmployeeServiceTest`**: Employee creation, duplicate prevention, updates, profile lookup.
+- **`AttendanceServiceTest`**: Daily check-in/out logic, duplicate check-in prevention, duration calculation.
+- **`LeaveServiceTest`**: Application validation, date range verification, admin approval and rejection workflows.
+- **`SalaryServiceTest`**: Compensation calculation, BigDecimal precision, structure updates.
+- **`ApplicationTest`**: Spring ApplicationContext load tests with H2 in-memory DB.
 
 ---
 
-## 🏗️ Build
+## 📮 Postman Collection
+
+The project includes a ready-to-use Postman test suite: [`DayFlow_HRMS.postman_collection.json`](DayFlow_HRMS.postman_collection.json).
+
+1. Open **Postman** -> Click **Import** -> Select `DayFlow_HRMS.postman_collection.json`.
+2. The collection includes pre-configured collection variables:
+   - `base_url`: `http://localhost:8081` (or your local port)
+   - `admin_token`: Automatically captured upon running **Admin Login**.
+   - `employee_token`: Automatically captured upon running **Employee Login**.
+   - `created_employee_id`: Automatically populated when creating a new employee.
+
+---
+
+## 📦 Building for Production
+
+To create a standalone production JAR executable:
 
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
 .\mvnw.cmd clean package -DskipTests
 ```
 
-JAR produced at: `target/DayFlow-0.0.1-SNAPSHOT.jar`
+The resulting executable JAR will be located at:
+```
+target/DayFlow-0.0.1-SNAPSHOT.jar
+```
+
+Run the production JAR:
+```bash
+java -jar target/DayFlow-0.0.1-SNAPSHOT.jar
+```
 
 ---
 
-## ⚠️ Important Notes
+## 👥 Frontend Integration
 
-1. **JAVA_HOME**: Must point to Java 21. If `JAVA_HOME` points to JDK 17, set it before running Maven.
-2. **First login**: Change the admin password immediately after first login.
-3. **Email**: Gmail requires App Passwords, not your regular Gmail password.
-4. **Tokens**: Password setup tokens expire in 48h, reset tokens in 1h.
-5. **Salary**: Always stored as `BigDecimal` — never use `double/float` for money.
+For the accompanying user interface, refer to the [DayFlow Frontend React Application](../DayFlowFrontend/README.md).

@@ -16,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndCompany_NameIgnoreCase(String email, String companyName);
     boolean existsByEmail(String email);
     boolean existsByEmailAndCompanyId(String email, Long companyId);
+    List<User> findByCompanyIdAndRole_Name(Long companyId, com.techtitans.dayflow.common.enums.RoleName roleName);
 }

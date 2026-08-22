@@ -67,6 +67,7 @@ public class LeaveService {
                 .startDate(request.startDate())
                 .endDate(request.endDate())
                 .remarks(request.remarks())
+                .attachmentUrl(request.attachmentUrl())
                 .status(LeaveStatus.PENDING)
                 .build();
 

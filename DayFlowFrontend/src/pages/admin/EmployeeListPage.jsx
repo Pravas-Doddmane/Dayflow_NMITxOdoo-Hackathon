@@ -15,6 +15,8 @@ import {
   Briefcase,
   Calendar,
   Sparkles,
+  RefreshCw,
+  Shuffle,
 } from 'lucide-react';
 import { employeeApi } from '../../api/employeeApi';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -46,9 +48,14 @@ export const EmployeeListPage = () => {
     targetStatus: null,
   });
 
+  const generateRandomEmployeeCode = () => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    return `EMP-${randomNum}`;
+  };
+
   // Forms
   const [createForm, setCreateForm] = useState({
-    employeeCode: '',
+    employeeCode: generateRandomEmployeeCode(),
     firstName: '',
     lastName: '',
     email: '',
@@ -60,6 +67,23 @@ export const EmployeeListPage = () => {
     department: '',
     joiningDate: new Date().toISOString().split('T')[0],
   });
+
+  const openAddModal = () => {
+    setCreateForm({
+      employeeCode: generateRandomEmployeeCode(),
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      dateOfBirth: '',
+      gender: 'MALE',
+      designation: '',
+      department: '',
+      joiningDate: new Date().toISOString().split('T')[0],
+    });
+    setIsAddModalOpen(true);
+  };
 
   const [editForm, setEditForm] = useState({
     firstName: '',
@@ -216,7 +240,7 @@ export const EmployeeListPage = () => {
 
         <button
           type="button"
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={openAddModal}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition-all self-start sm:self-auto"
         >
           <UserPlus className="w-4 h-4" />
@@ -293,9 +317,21 @@ export const EmployeeListPage = () => {
                     {/* Name & Avatar */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
-                          {getInitials(emp.fullName || emp.firstName)}
-                        </div>
+                        {emp.profilePictureUrl ? (
+                          <img
+                            src={
+                              emp.profilePictureUrl.startsWith('http') || emp.profilePictureUrl.startsWith('data:')
+                                ? emp.profilePictureUrl
+                                : `${BASE_URL}${emp.profilePictureUrl}`
+                            }
+                            alt={emp.fullName}
+                            className="w-8 h-8 rounded-xl object-cover border border-indigo-500 shadow-sm shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
+                            {getInitials(emp.fullName || emp.firstName)}
+                          </div>
+                        )}
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white">
                             {emp.fullName || `${emp.firstName} ${emp.lastName}`}
@@ -411,9 +447,25 @@ export const EmployeeListPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Employee Code */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Employee Code *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Employee Code (Auto-Generated) *
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCreateForm((prev) => ({
+                      ...prev,
+                      employeeCode: generateRandomEmployeeCode(),
+                    }))
+                  }
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                  title="Generate another random ID"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Generate New</span>
+                </button>
+              </div>
               <input
                 type="text"
                 required
@@ -421,8 +473,8 @@ export const EmployeeListPage = () => {
                 onChange={(e) =>
                   setCreateForm({ ...createForm, employeeCode: e.target.value })
                 }
-                placeholder="e.g. EMP001"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase font-mono"
+                placeholder="e.g. EMP-8291"
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase font-mono font-bold text-indigo-600 dark:text-indigo-400"
               />
             </div>
 
