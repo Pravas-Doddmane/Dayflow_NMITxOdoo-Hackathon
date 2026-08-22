@@ -57,7 +57,7 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminPass@2024}
 
       # Mail Configuration
-      MAIL_USERNAME: ${MAIL_USERNAME:-53cpravas@gmail.com}
+      MAIL_USERNAME: ${MAIL_USERNAME:-addYours}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-addYours}
 
       # Base URL & CORS
