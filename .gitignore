@@ -1,0 +1,19 @@
+# =============================================
+# Root-level .gitignore — DayFlow Monorepo
+# =============================================
+
+# Real environment files — NEVER commit secrets
+.env
+*.env
+!.env.example
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docker override files (local tweaks)
+docker-compose.override.yml
